@@ -1,6 +1,4 @@
-import { useState } from "react";
-import "./App.css";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 function App() {
@@ -13,9 +11,8 @@ function App() {
     try {
       const response = await axios.get("http://localhost:5000/api/users");
       setUsers(response.data);
-      console.log(response.data);
     } catch (error) {
-      setError("Failed to get users", error);
+      setError("Failed to get users");
     }
   };
 
@@ -25,62 +22,86 @@ function App() {
 
   const createUser = async (e) => {
     e.preventDefault();
-
     try {
-      const res = await axios.post("http://localhost:5000/api/user", {
+      const res = await axios.post("http://localhost:5000/api/users", {
         name,
         email,
       });
-      setUsers(...users, res.data);
+      setUsers([...users, res.data]);
+      setName("");
+      setEmail("");
+      setError("");
     } catch (error) {
-      setError("Failed to create user", error);
+      setError("Failed to create user");
     }
   };
 
-  console.log("users:", users);
-
   return (
-    <>
-      <div>
-        <h2>User List</h2>
-        <p className="text-red-400">{error}</p>
-        <ul>
-          {users.map((user) => {
-            return (
-              <li key={user.id}>
-                {user.name} - {user.email}
-              </li>
-            );
-          })}
-        </ul>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4">
+      <div className="w-full max-w-lg bg-white rounded-2xl shadow-lg p-8 space-y-6">
+        <h1 className="text-3xl font-bold text-center text-blue-700">
+          User Management
+        </h1>
 
-        <h2 className="">Add User</h2>
-        <div className="space-y-4 mt-4">
-          <input
-            type="text"
-            placeholder="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="border px-2 py-1"
-          />{" "}
-          <br />
-          <input
-            type="email"
-            placeholder="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border px-2 py-1"
-          />{" "}
-          <br />
-          <button
-            className="border bg-black text-white px-4 py-2"
-            onClick={createUser}
-          >
-            Add
-          </button>
+        {error && (
+          <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm">
+            {error}
+          </div>
+        )}
+
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">User List</h2>
+          <ul className="divide-y divide-gray-200 border border-gray-200 rounded-lg">
+            {users.map((user) => (
+              <li
+                key={user.id}
+                className="p-4 flex justify-between items-center hover:bg-gray-50"
+              >
+                <div>
+                  <p className="font-medium text-gray-800">{user.name}</p>
+                  <p className="text-gray-500 text-sm">{user.email}</p>
+                </div>
+              </li>
+            ))}
+            {users.length === 0 && (
+              <li className="p-4 text-gray-400 text-sm text-center">No users found.</li>
+            )}
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">Add New User</h2>
+          <form onSubmit={createUser} className="space-y-4">
+            <div>
+              <input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                required
+              />
+            </div>
+            <div>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+            >
+              Add User
+            </button>
+          </form>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
